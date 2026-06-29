@@ -145,41 +145,44 @@ class PBMImage:
         # Alcance e área da máscara
         raio = tamanho_mascara // 2
         area_mascara = tamanho_mascara * tamanho_mascara
+        try:
+            # Versão com bordas estendidas
+            imagem_com_borda = PBMImage.double_padding(imagem, tamanho_borda=raio)
 
-        # Versão com bordas estendidas
-        imagem_com_borda = PBMImage.double_padding(imagem, tamanho_borda=raio)
+            imagem_media = []
 
-        imagem_media = []
+            for y in range(altura):
+                linha_resultado = []
+                
+                for x in range(largura):
+                    # Corrigir o centro da máscara
+                    centro_y = y + raio
+                    centro_x = x + raio
 
-        for y in range(altura):
-            linha_resultado = []
-            
-            for x in range(largura):
-                # Corrigir o centro da máscara
-                centro_y = y + raio
-                centro_x = x + raio
+                    soma_mascara = 0
 
-                soma_mascara = 0
+                    # Percorrer os elementos da máscara
+                    for i in range(-raio, raio + 1):
+                        for j in range(-raio, raio + 1):
+                            pixel_adjacente = imagem_com_borda.matriz[centro_y + i][centro_x + j]
+                            soma_mascara += pixel_adjacente
 
-                # Percorrer os elementos da máscara
-                for i in range(-raio, raio + 1):
-                    for j in range(-raio, raio + 1):
-                        pixel_adjacente = imagem_com_borda[centro_y + i][centro_x + j]
-                        soma_mascara += pixel_adjacente
+                    # Média
+                    media = int(soma_mascara/area_mascara)
 
-                # Média
-                media = int(soma_mascara/area_mascara)
+                    # Adiciona o valor à linha de resultado
+                    linha_resultado.append(media)
 
-                # Adiciona o valor à linha de resultado
-                linha_resultado.append(media)
+                imagem_media.append(linha_resultado)
 
-            imagem_media.append(linha_resultado)
-
-        return PBMImage(
-            matriz=imagem_media,
-            altura=altura,
-            largura=largura
-        )
+            return PBMImage(
+                matriz=imagem_media,
+                altura=altura,
+                largura=largura
+            )
+        
+        except Exception as e:
+            print(f"Erro na função de média: {e}")
             
 
     def show(self) -> None:

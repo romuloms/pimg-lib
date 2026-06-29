@@ -9,10 +9,12 @@ if __name__ == "__main__":
         # print(f"Altura: {imagem['altura']} px")
         # print(f"Valor Máximo: {imagem['valor_maximo']}")
         # img = PBMImage.double_padding(imagem)
-        img_negativa = imagem.negative()
-        img_negativa_path = PBMImage.save(img_negativa, "img_negativa")
+        # img_negativa = imagem.negative()
+        # img_negativa_path = PBMImage.save(img_negativa, "img_negativa")
+        img_media = PBMImage.mean(imagem=imagem)
+        img_media_path = PBMImage.save(imagem=img_media, nome="img_media")
 
-        PBMImage.show_file(img_negativa_path)
+        PBMImage.show_file(img_media_path)
 
     except Exception as e:
         print(f"Erro ao processar a imagem: {e}")
