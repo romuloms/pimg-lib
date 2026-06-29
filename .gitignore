@@ -1,0 +1,10 @@
+*/__pycache__
+*/.venv
+*/docs
+
+Figuras
+
+*.pbm
+*.pdf
+*.zip
+*.DS_Store
