@@ -183,7 +183,63 @@ class PBMImage:
         
         except Exception as e:
             print(f"Erro na função de média: {e}")
+
+    
+    def median(imagem: 'PBMImage', tamanho_mascara: int = 3) -> 'PBMImage':
+        """Aplica filtro da mediana"""
+        if tamanho_mascara % 2 == 0:
+            raise ValueError("O tamanho da máscara deve ser um número ímpar.")
+
+        if tamanho_mascara < 3:
+            raise ValueError("O tamanho da máscara deve maior ou igual a 3.")
+        
+        altura = imagem.altura
+        largura = imagem.largura
+
+        # Alcance e área da máscara
+        raio = tamanho_mascara // 2
+        total_elementos = tamanho_mascara * tamanho_mascara
+        try:
+            # Versão com bordas estendidas
+            imagem_com_borda = PBMImage.double_padding(imagem, tamanho_borda=raio)
+
+            imagem_mediana = []
+
+            for y in range(altura):
+                linha_resultado = []
+
+                for x in range(largura):
+                    # Corrigir o centro da máscara
+                    centro_y = y + raio
+                    centro_x = x + raio
+
+                    elementos = []
+
+                    # Percorrer os elementos da máscara
+                    for i in range(-raio, raio + 1):
+                        for j in range(-raio, raio + 1):
+                            pixel = imagem_com_borda.matriz[centro_y + i][centro_x + j]
+                            elementos.append(pixel)
+
+                    # Mediana
+                    elementos.sort()
+                    posicao = int((total_elementos//2) + 1)
+                    mediana = elementos[posicao]
+
+                    # Adiciona o valor à linha de resultado
+                    linha_resultado.append(mediana)
+
+                imagem_mediana.append(linha_resultado)
             
+            return PBMImage(
+                matriz=imagem_mediana,
+                altura=altura,
+                largura=largura
+            )
+        
+        except Exception as e:
+            print(f"Erro na função de mediana: {e}")
+        
 
     def show(self) -> None:
         """Exibe a imagem atual para visualização usando o visualizador padrão do sistema"""
