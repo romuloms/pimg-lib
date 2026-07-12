@@ -56,7 +56,7 @@ python main.py
 - Desenha retângulos nas palavras detectadas:
   - `palavras_destacadas = PBMImage.draw_rectangle(img_mediana, coordenadas)`
 - Salva o resultado:
-  - `imagem_analisada_path = PBMImage.save(imagem=palavras_destacadas, nome="img_media")`
+  - `imagem_analisada_path = PBMImage.save(imagem=palavras_destacadas, nome="imagem_analisada")`
 - Exibe a imagem final:
   - `PBMImage.show_file(imagem_analisada_path)`
 
@@ -69,7 +69,7 @@ imagem = PBMImage.from_file("docs/lorem_s12_c02_espacos_noise.pbm")
 img_mediana = PBMImage.median(imagem=imagem)
 coordenadas = img_mediana.analyze_text()
 resultado = PBMImage.draw_rectangle(img_mediana, coordenadas)
-PBMImage.save(imagem=resultado, nome="img_media")
+PBMImage.save(imagem=resultado, nome="imagem_analisada")
 ```
 
 ## Observações
