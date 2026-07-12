@@ -1,4 +1,8 @@
+import logging
 from typing import List, Dict, Sequence, Tuple, Union, Any, Optional, Type
+
+
+logger = logging.getLogger(__name__)
 
 
 class PBMImage:
@@ -51,6 +55,7 @@ class PBMImage:
 
             return cls(matriz, largura, altura)
         except (FileNotFoundError, IndexError, ValueError) as e:
+            logger.exception("Erro ao ler arquivo PBM: %s", caminho_arquivo)
             raise Exception(f"Erro ao ler arquivo PBM: {e}")
 
     @staticmethod
@@ -76,6 +81,7 @@ class PBMImage:
             return caminho_arquivo
         
         except Exception as e:
+            logger.exception("Erro ao salvar arquivo PBM: %s", caminho_arquivo)
             raise Exception(f"Erro ao salvar arquivo PBM: {e}")
 
     
@@ -112,7 +118,8 @@ class PBMImage:
                 subprocess.run(["xdg-open", caminho_temp], check=True)
                 
         except Exception as e:
-            print(f"Erro ao exibir a imagem sem bibliotecas externas: {e}")
+            logger.exception("Erro ao exibir a imagem sem bibliotecas externas")
+            raise
 
     @staticmethod
     def show_file(caminho_arquivo: str) -> None:
@@ -240,7 +247,8 @@ class PBMImage:
             )
         
         except Exception as e:
-            print(f"Erro na função de média: {e}")
+            logger.exception("Erro na função de média")
+            raise
 
     
     @staticmethod
@@ -297,85 +305,108 @@ class PBMImage:
             )
         
         except Exception as e:
-            print(f"Erro na função de mediana: {e}")
+            logger.exception("Erro na função de mediana")
+            raise
 
     
     @staticmethod
     def count_columns(imagem: 'PBMImage') -> int:
         """Função para contar colunas de uma imagem"""
-        matriz = imagem.matriz
-        altura = imagem.altura
-        largura = imagem.largura
+        try:
+            matriz = imagem.matriz
+            altura = imagem.altura
+            largura = imagem.largura
 
-        soma_colunas = [0] * largura
+            soma_colunas = [0] * largura
 
-        for coluna in range(largura):
-            for linha in range(altura):
-                soma_colunas[coluna] += matriz[linha][coluna]
+            for coluna in range(largura):
+                for linha in range(altura):
+                    soma_colunas[coluna] += matriz[linha][coluna]
 
-        colunas_vazias = soma_colunas == 0
-        colunas_vazias = [int(item) for item in colunas_vazias]       
+            colunas_vazias = [int(item == 0) for item in soma_colunas]
 
-        mudancas = [0] * (len(colunas_vazias) - 1)
+            mudancas = [0] * (len(colunas_vazias) - 1)
 
-        for indice in range(len(colunas_vazias) - 1):
-            mudancas[indice] = colunas_vazias[indice+1] - colunas_vazias[indice]
+            for indice in range(len(colunas_vazias) - 1):
+                mudancas[indice] = colunas_vazias[indice + 1] - colunas_vazias[indice]
 
-        total_colunas = 0
+            total_colunas = 0
 
-        for mudanca in mudancas:
-            if mudanca == -1:
-                total_colunas += 1
+            for mudanca in mudancas:
+                if mudanca == -1:
+                    total_colunas += 1
 
-        return total_colunas
+            return total_colunas
+        except Exception:
+            logger.exception("Erro ao contar colunas da imagem")
+            raise
     
 
     @staticmethod
     def count_lines(imagem: 'PBMImage') -> int:
         """Função para contar as linhas de uma imagem"""
-        matriz = imagem.matriz
-        altura = imagem.altura
-        largura = imagem.largura
+        try:
+            matriz = imagem.matriz
+            altura = imagem.altura
+            largura = imagem.largura
 
-        soma_linhas = [0] * altura
-        
-        for linha in range(altura):
-            for coluna in range(largura):
-                soma_linhas[linha] += matriz[linha][coluna]
-        
-        linhas_vazias = soma_linhas == 0
-        linhas_vazias = [int(item) for item in linhas_vazias]
+            soma_linhas = [0] * altura
+            
+            for linha in range(altura):
+                for coluna in range(largura):
+                    soma_linhas[linha] += matriz[linha][coluna]
+            
+            linhas_vazias = [int(item == 0) for item in soma_linhas]
 
-        mudancas = [0] * (len(linhas_vazias) - 1)
+            mudancas = [0] * (len(linhas_vazias) - 1)
 
-        for indice in range(len(linhas_vazias) - 1):
-            mudancas[indice] = linhas_vazias[indice+1] - linhas_vazias[indice]
+            for indice in range(len(linhas_vazias) - 1):
+                mudancas[indice] = linhas_vazias[indice + 1] - linhas_vazias[indice]
+
+            total_linhas = 0
+
+            for mudanca in mudancas:
+                if mudanca == -1:
+                    total_linhas += 1
+
+            return total_linhas
+        except Exception:
+            logger.exception("Erro ao contar linhas da imagem")
+            raise
 
 
     def _variance(self, arr: list) -> float:
-        media = sum(arr) / len(arr)
+        try:
+            media = sum(arr) / len(arr)
 
-        dif_quadradas = [(x - media) ** 2 for x in arr]
+            dif_quadradas = [(x - media) ** 2 for x in arr]
 
-        variancia = sum(dif_quadradas) / len(arr)
+            variancia = sum(dif_quadradas) / len(arr)
 
-        return variancia
+            return variancia
+        except Exception:
+            logger.exception("Erro ao calcular variância")
+            raise
 
     def _combined_variance(self, grupo_a: list, grupo_b: list) -> float:
         """Mede o quão homogêneo cada grupo fica e combina essa medida num único número.
 
         Quanto menor o valor devolvido, melhor foi a separação entre grupo_a e grupo_b, ou seja, mais parecidos entre si estão os valores dentro de cada grupo."""
-        media_a = sum(grupo_a) / len(grupo_a) if grupo_a else 0
-        media_b = sum(grupo_b) / len(grupo_b) if grupo_b else 0
+        try:
+            media_a = sum(grupo_a) / len(grupo_a) if grupo_a else 0
+            media_b = sum(grupo_b) / len(grupo_b) if grupo_b else 0
 
-        variancia_a = self._variance(grupo_a)
-        variancia_b = self._variance(grupo_b)
+            variancia_a = self._variance(grupo_a)
+            variancia_b = self._variance(grupo_b)
 
-        # (nA * variancia_a + nB * variancia_b) / quantidade de gaps totais
-        variancia_combinada = (len(grupo_a) * variancia_a + len(grupo_b) * variancia_b) / (len(grupo_a) + len(grupo_b))
+            # (nA * variancia_a + nB * variancia_b) / quantidade de gaps totais
+            variancia_combinada = (len(grupo_a) * variancia_a + len(grupo_b) * variancia_b) / (len(grupo_a) + len(grupo_b))
 
-        # Retorna a variância combinada ponderada pelo tamanho de cada grupo
-        return variancia_combinada
+            # Retorna a variância combinada ponderada pelo tamanho de cada grupo
+            return variancia_combinada
+        except Exception:
+            logger.exception("Erro ao calcular variância combinada")
+            raise
 
 
     def _gap_threshold(self, gaps: list, altura_referencia: int = None, fracao_fallback: float = 0.75) -> float:
@@ -386,67 +417,80 @@ class PBMImage:
         (0 ou 1 valores), usa uma heurística baseada na altura do
         bloco de referência (linha ou letra) medida na imagem
         especificamente"""
-        quantidade_gaps = len(gaps)
+        try:
+            quantidade_gaps = len(gaps)
 
-        # Caso 1 - Sem gaps
-        if quantidade_gaps == 0:
-            return float('inf')
-        
-        # Caso 2 - Um gap
-        if quantidade_gaps == 1: 
-            if altura_referencia is None:
-                raise ValueError(
-                    "Com 1 único gap, é necessário informar altura_referencia para usar a heurística de fallback."
-                )
-            return altura_referencia * fracao_fallback
-        
-        gaps_ordenados = sorted(gaps)
-        melhor_variancia = float('inf')
-        indice_melhor_corte = 1
+            # Caso 1 - Sem gaps
+            if quantidade_gaps == 0:
+                return float('inf')
+            
+            # Caso 2 - Um gap
+            if quantidade_gaps == 1: 
+                if altura_referencia is None:
+                    raise ValueError(
+                        "Com 1 único gap, é necessário informar altura_referencia para usar a heurística de fallback."
+                    )
+                return altura_referencia * fracao_fallback
+            
+            gaps_ordenados = sorted(gaps)
+            melhor_variancia = float('inf')
+            indice_melhor_corte = 1
 
-        # Não corta antes do primeiro elemento nem depois do último
-        for i in range(1, quantidade_gaps):
-            grupo_a = gaps_ordenados[:i]
-            grupo_b = gaps_ordenados[i:]
-            variancia_atual = self._combined_variance(grupo_a, grupo_b)
+            # Não corta antes do primeiro elemento nem depois do último
+            for i in range(1, quantidade_gaps):
+                grupo_a = gaps_ordenados[:i]
+                grupo_b = gaps_ordenados[i:]
+                variancia_atual = self._combined_variance(grupo_a, grupo_b)
 
-            if variancia_atual < melhor_variancia:
-                melhor_variancia = variancia_atual
-                indice_melhor_corte = i
+                if variancia_atual < melhor_variancia:
+                    melhor_variancia = variancia_atual
+                    indice_melhor_corte = i
 
-        # O threshold é o ponto intermediário entre o último gap do grupo pequeno e o primeiro gap do grupo grande no corte vencedor
-        ultimo_grupo_a = gaps_ordenados[indice_melhor_corte - 1]
-        primeiro_grupo_b = gaps_ordenados[indice_melhor_corte]
-        threshold = (ultimo_grupo_a + primeiro_grupo_b) / 2
+            # O threshold é o ponto intermediário entre o último gap do grupo pequeno e 
+            # o primeiro gap do grupo grande no corte vencedor
+            ultimo_grupo_a = gaps_ordenados[indice_melhor_corte - 1]
+            primeiro_grupo_b = gaps_ordenados[indice_melhor_corte]
+            threshold = (ultimo_grupo_a + primeiro_grupo_b) / 2
 
-        return threshold        
+            return threshold        
+        except Exception:
+            logger.exception("Erro ao calcular limiar de gap")
+            raise
 
 
     @staticmethod
-    def draw_rectangle(imagem: 'PBMImage', coordenadas_palavras: list) -> list:
+    def draw_rectangle(imagem: 'PBMImage', coordenadas_palavras: list) -> 'PBMImage':
         """
         Recebe as coordenadas das palavras e desenha os retângulos na matriz.
         Assume que o valor 1 representa a cor preta (traço do retângulo).
         """
-        matriz = imagem.matriz
-        altura = imagem.altura
-        largura = imagem.largura
+        try:
+            matriz = imagem.matriz
+            altura = imagem.altura
+            largura = imagem.largura
 
-        for linha_inicial, linha_final, coluna_inicial, coluna_final in coordenadas_palavras:
-            linha_topo = max(0, linha_inicial - 1)
-            linha_inf = min(altura - 1, linha_final + 1)
-            coluna_esq = max(0, coluna_inicial - 1)
-            coluna_dir = min(largura - 1, coluna_final + 1)
+            for linha_inicial, linha_final, coluna_inicial, coluna_final in coordenadas_palavras:
+                linha_topo = max(0, linha_inicial - 1)
+                linha_inf = min(altura - 1, linha_final + 1)
+                coluna_esq = max(0, coluna_inicial - 1)
+                coluna_dir = min(largura - 1, coluna_final + 1)
 
-            for coluna in range(coluna_esq, coluna_dir + 1):
-                matriz[linha_topo][coluna] = 1
-                matriz[linha_inf][coluna] = 1
+                for coluna in range(coluna_esq, coluna_dir + 1):
+                    matriz[linha_topo][coluna] = 1
+                    matriz[linha_inf][coluna] = 1
 
-            for linha in range(linha_topo, linha_inf + 1):
-                matriz[linha][coluna_esq] = 1
-                matriz[linha][coluna_dir] = 1
+                for linha in range(linha_topo, linha_inf + 1):
+                    matriz[linha][coluna_esq] = 1
+                    matriz[linha][coluna_dir] = 1
 
-        return matriz
+            return PBMImage(
+                    matriz=matriz,
+                    altura=altura,
+                    largura=largura
+                )
+        except Exception:
+            logger.exception("Erro ao desenhar retângulos na imagem")
+            raise
 
 
     def _extract_blocks_gaps(
@@ -458,85 +502,101 @@ class PBMImage:
         - blocos: lista de tuplas (inicio, fim) onde há texto.
         - gaps: lista de inteiros com o tamanho do espaço vazio entre os blocos.
         """
-        blocos: list[Tuple[int, int]] = []
-        gaps = []
-        em_bloco = False
-        inicio_bloco = 0
-        fim_ultimo_bloco= -1
+        try:
+            blocos: list[Tuple[int, int]] = []
+            gaps = []
+            em_bloco = False
+            inicio_bloco = 0
+            fim_ultimo_bloco= -1
 
-        for i, valor in enumerate(vetor_projecao):
-            if valor > 0 and not em_bloco:
-                em_bloco = True
-                inicio_bloco = i
+            for i, valor in enumerate(vetor_projecao):
+                if valor > 0 and not em_bloco:
+                    em_bloco = True
+                    inicio_bloco = i
 
-                # Se já passou por um bloco antes, o que ficou para trás foi um gap
-                if fim_ultimo_bloco != -1:
-                    gaps.append(inicio_bloco - fim_ultimo_bloco - 1)
+                    # Se já passou por um bloco antes, o que ficou para trás foi um gap
+                    if fim_ultimo_bloco != -1:
+                        gaps.append(inicio_bloco - fim_ultimo_bloco - 1)
 
-            elif valor == 0 and em_bloco:
-                em_bloco = False
-                blocos.append((inicio_bloco, i - 1))
-                fim_ultimo_bloco = i - 1
+                elif valor == 0 and em_bloco:
+                    em_bloco = False
+                    blocos.append((inicio_bloco, i - 1))
+                    fim_ultimo_bloco = i - 1
 
-        # Fechar o último bloco se a imagem terminar com texto
-        if em_bloco:
-            blocos.append((inicio_bloco, len(vetor_projecao) - 1))
+            # Fechar o último bloco se a imagem terminar com texto
+            if em_bloco:
+                blocos.append((inicio_bloco, len(vetor_projecao) - 1))
 
-        return blocos, gaps
+            return blocos, gaps
+        except Exception:
+            logger.exception("Erro ao extrair blocos e gaps da projeção")
+            raise
     
 
-    def analyze_text(self, imagem: 'PBMImage') -> list:
+    def analyze_text(self) -> list:
         """
         Faz a contagem isolada e retorna as coordenadas de cada palavra
         """
-        matriz = imagem.matriz
-        projecao_colunas = [sum(coluna) for coluna in zip(*matriz)]
-        blocos_colunas, _ = self._extract_blocks_gaps(projecao_colunas)
+        try:
+            matriz = self.matriz
+            projecao_colunas = [sum(coluna) for coluna in zip(*matriz)]
+            blocos_colunas, _ = self._extract_blocks_gaps(projecao_colunas)
 
-        total_linhas = 0
-        total_palavras = 0
-        coordenadas_palavras = []
+            total_linhas = 0
+            total_palavras = 0
+            coordenadas_palavras = []
 
-        for c_inicio, c_fim in blocos_colunas:
-            fatia_coluna = matriz[:, c_inicio:c_fim + 1]
+            for inicio_coluna, fim_coluna in blocos_colunas:
+                # 'Fatia' de coluna por linha do texto - inicio e fim de texto em cada coluna e de cada linha
+                fatia_coluna = [linha[inicio_coluna:fim_coluna + 1] for linha in matriz]
 
-            projecao_linhas = [sum(linha) for linha in matriz]
-            blocos_linhas, _ = self._extract_blocks_gaps(projecao_linhas)
-            total_linhas += len(blocos_linhas)
+                # Detecção de gaps entre Palavras
+                projecao_linhas = [sum(linha) for linha in fatia_coluna]
+                
+                blocos_linhas, _ = self._extract_blocks_gaps(projecao_linhas)
+                total_linhas += len(blocos_linhas)
 
-            for l_inicio, l_fim in blocos_linhas:
-                fatia_linha = fatia_coluna[l_inicio:l_fim + 1, :]
+                for inicio_linha, fim_linha in blocos_linhas:
+                    fatia_linha = fatia_coluna[inicio_linha:fim_linha + 1]
 
-                projecao_letras = [sum(coluna) for coluna in zip(*fatia_linha)]
-                blocos_letras, gaps_letras = self._extract_blocks_gaps(projecao_letras)
+                    # Detecção de gaps entre Letras
+                    projecao_letras = [sum(coluna) for coluna in zip(*fatia_linha)] if fatia_linha else []
+                    
+                    blocos_letras, gaps_letras = self._extract_blocks_gaps(projecao_letras)
 
-                altura_linha = l_fim - l_inicio + 1
-                threshold = self._gap_threshold(gaps_letras, altura_referencia=altura_linha)
+                    if not blocos_letras:
+                        continue
 
-                palavra_c_inicio = blocos_letras[0][0]
-                palavra_c_fim = blocos_letras[0][1]
+                    altura_linha = fim_linha - inicio_linha + 1
+                    threshold = self._gap_threshold(gaps_letras, altura_referencia=altura_linha)
 
-                for i in range(1, len(blocos_letras)):
-                    gap_atual = gaps_letras[i-1]
+                    palavra_inicio_coluna = blocos_letras[0][0]
+                    palavra_fim_coluna = blocos_letras[0][1]
 
-                    if gap_atual > threshold:
-                        # Gap grande = 1 palavra
-                        coordenadas_palavras.append((l_inicio, l_fim, c_inicio + palavra_c_inicio, c_inicio + palavra_c_fim))
+                    for i in range(1, len(blocos_letras)):
+                        gap_atual = gaps_letras[i - 1]
 
-                        # inicia próxima palavra
-                        palavra_c_inicio = blocos_letras[i][0]
-                        palavra_c_fim = blocos_letras[i][1]
+                        if gap_atual > threshold:
+                            # Gap grande = 1 palavra
+                            coordenadas_palavras.append((inicio_linha, fim_linha, inicio_coluna + palavra_inicio_coluna, inicio_coluna + palavra_fim_coluna))
 
-                    else:
-                        # Gap pequeno = mesma palavras
-                        palavra_c_fim = blocos_letras[i][1]
+                            # inicia próxima palavra
+                            palavra_inicio_coluna = blocos_letras[i][0]
+                            palavra_fim_coluna = blocos_letras[i][1]
 
-                coordenadas_palavras.append((l_inicio, l_fim, c_inicio + palavra_c_inicio, c_inicio + palavra_c_fim))
-                total_palavras += 1
+                        else:
+                            # Gap pequeno = mesma palavras
+                            palavra_fim_coluna = blocos_letras[i][1]
 
-        print(f"Resultados encontrados:")
-        print(f"Colunas: {len(blocos_colunas)}")
-        print(f"Linhas: {total_linhas}")
-        print(f"Palavras: {total_palavras}")
+                    coordenadas_palavras.append((inicio_linha, fim_linha, inicio_coluna + palavra_inicio_coluna, inicio_coluna + palavra_fim_coluna))
+                    total_palavras += 1
 
-        return coordenadas_palavras
+            print(f"Resultados encontrados:")
+            print(f"Colunas: {len(blocos_colunas)}")
+            print(f"Linhas: {total_linhas}")
+            print(f"Palavras: {total_palavras}")
+
+            return coordenadas_palavras
+        except Exception:
+            logger.exception("Erro ao analisar o texto da imagem")
+            raise
