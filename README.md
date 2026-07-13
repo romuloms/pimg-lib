@@ -6,7 +6,7 @@ O foco do projeto é aplicar operações simples de processamento de imagens e a
 
 ## O que a biblioteca faz
 
-A classe principal é `PBMImage` (em `testes/pbm_image.py`) e oferece:
+A classe principal é `PBMImage` (em `src/pbm_image.py`) e oferece:
 
 - Carregamento de arquivo `.pbm` P1 (`from_file`)
 - Salvamento de imagem PBM (`save`)
@@ -20,21 +20,23 @@ A classe principal é `PBMImage` (em `testes/pbm_image.py`) e oferece:
   - detecção de blocos e gaps (`_extract_blocks_gaps`)
   - análise de palavras e coordenadas (`analyze_text`)
   - destaque com retângulos (`draw_rectangle`)
+- Ruídos:
+  - sal e pimenta
 
 A biblioteca também possui tratamento de erro com logs via módulo `logging` em pontos críticos de leitura, escrita e processamento.
 
 ## Estrutura mínima usada
 
-- `testes/pbm_image.py`: implementação da classe `PBMImage`
-- `testes/main.py`: exemplo completo de uso
-- `testes/docs/*.pbm`: imagens de entrada para teste (diretório não versionado)
+- `src/pbm_image.py`: implementação da classe `PBMImage`
+- `src/main.py`: exemplo completo de uso
+- `src/docs/*.pbm`: imagens de entrada para teste (diretório não versionado)
 
 ## Passo a passo de como testar
 
-1. Entre na pasta de testes:
+1. Entre na pasta src:
 
 ```bash
-cd testes
+cd src
 ```
 
 2. Execute o script de exemplo:
@@ -77,5 +79,5 @@ PBMImage.save(imagem=resultado, nome="imagem_analisada")
 ## Observações
 
 - O parser foi feito para PBM **P1**.
-- Caminhos relativos em `main.py` consideram execução dentro da pasta `testes`.
+- Caminhos relativos em `main.py` consideram execução dentro da pasta `src`.
 - Em caso de erro, os métodos registram logs para facilitar diagnóstico.
