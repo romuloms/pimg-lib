@@ -3,8 +3,9 @@ from pbm_image import PBMImage
 
 if __name__ == "__main__":
     try:
-        imagem = PBMImage.from_file("docs/lorem_s12_c02_espacos_noise.pbm")
-        PBMImage.show_file("docs/lorem_s12_c02_espacos_noise.pbm")
+        caminho_imagem = input("Digite o caminho para a imagem que quer analisar: ")
+        imagem = PBMImage.from_file(caminho_imagem)
+        PBMImage.show_file(caminho_imagem)
 
         img_mediana = PBMImage.median(imagem=imagem)
         
@@ -12,7 +13,7 @@ if __name__ == "__main__":
 
         palavras_destacadas = PBMImage.draw_rectangle(img_mediana, coordenadas)
 
-        imagem_analisada_path = PBMImage.save(imagem=palavras_destacadas, nome="img_media")
+        imagem_analisada_path = PBMImage.save(imagem=palavras_destacadas, nome=f"{caminho_imagem}_analisada")
 
         PBMImage.show_file(imagem_analisada_path)
 
