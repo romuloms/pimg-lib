@@ -29,7 +29,7 @@ A biblioteca também possui tratamento de erro com logs via módulo `logging` em
 - `testes/main.py`: exemplo completo de uso
 - `testes/docs/*.pbm`: imagens de entrada para teste (diretório não versionado)
 
-## Passo a passo objetivo (como no main.py)
+## Passo a passo de como testar
 
 1. Entre na pasta de testes:
 
