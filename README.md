@@ -45,18 +45,20 @@ python main.py
 
 3. O fluxo executado pelo `main.py` é:
 
+- Espera a entrada do usuário por linha de comando do caminho da imagem PBM:
+  - `caminho_imagem = input("Digite o caminho para a imagem que quer analisar: ")`
 - Carrega a imagem PBM:
-  - `imagem = PBMImage.from_file("docs/lorem_s12_c02_espacos_noise.pbm")`
+  - `imagem = PBMImage.from_file(caminho_imagem)`
 - Exibe a imagem original:
-  - `PBMImage.show_file("docs/lorem_s12_c02_espacos_noise.pbm")`
+  - `PBMImage.show_file(caminho_imagem)`
 - Aplica filtro da mediana:
   - `img_mediana = PBMImage.median(imagem=imagem)`
-- Analisa texto e coleta coordenadas das palavras:
+- Analisa texto e coleta coordenadas das palavras (aqui, já serão exibidos no terminal os valores de coluna, linha e palavras):
   - `coordenadas = img_mediana.analyze_text()`
 - Desenha retângulos nas palavras detectadas:
   - `palavras_destacadas = PBMImage.draw_rectangle(img_mediana, coordenadas)`
 - Salva o resultado:
-  - `imagem_analisada_path = PBMImage.save(imagem=palavras_destacadas, nome="imagem_analisada")`
+  - `imagem_analisada_path = PBMImage.save(imagem=palavras_destacadas, nome=f"{caminho_imagem}_analisada")`
 - Exibe a imagem final:
   - `PBMImage.show_file(imagem_analisada_path)`
 
