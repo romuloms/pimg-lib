@@ -1,4 +1,5 @@
 import logging
+import random
 from typing import List, Dict, Sequence, Tuple, Union, Any, Optional, Type
 
 
@@ -579,6 +580,7 @@ class PBMImage:
                         if gap_atual > threshold:
                             # Gap grande = 1 palavra
                             coordenadas_palavras.append((inicio_linha, fim_linha, inicio_coluna + palavra_inicio_coluna, inicio_coluna + palavra_fim_coluna))
+                            total_palavras += 1
 
                             # inicia próxima palavra
                             palavra_inicio_coluna = blocos_letras[i][0]
@@ -600,3 +602,37 @@ class PBMImage:
         except Exception:
             logger.exception("Erro ao analisar o texto da imagem")
             raise
+
+    
+    @staticmethod
+    def adicionar_ruido_sal_pimenta(imagem: 'PBMImage', probabilidade: float = 0.1) -> 'PBMImage':
+        """
+        Adiciona ruído Sal e Pimenta a uma imagem binária (P1).
+        
+        :param imagem: Imagem PBMImage original.
+        :param probabilidade: Chance de um pixel ser corrompido (0.0 a 1.0). Default é 5%.
+        :return: Nova PBMImage com o ruído aplicado.
+        """
+        if not (0.0 <= probabilidade <= 1.0):
+            raise ValueError("A probabilidade deve estar entre 0.0 e 1.0")
+
+        matriz_ruidosa = []
+        
+        for linha in imagem.matriz:
+            linha_ruido = []
+            for pixel in linha:
+                # random.random() gera um número decimal entre 0.0 e 1.0
+                if random.random() < probabilidade:
+                    # Escolha aleatória entre 0 (Sal) e 1 (Pimenta)
+                    pixel_corrompido = random.choice([0, 1])
+                    linha_ruido.append(pixel_corrompido)
+                else:
+                    linha_ruido.append(pixel)
+                    
+            matriz_ruidosa.append(linha_ruido)
+            
+        return PBMImage(
+            matriz=matriz_ruidosa,
+            largura=imagem.largura,
+            altura=imagem.altura,
+        )
